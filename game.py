@@ -1,13 +1,12 @@
 import pygame
 from random import uniform as func
-from time import sleep
 
 pygame.init()
 
 WIDTH = 600
 HEIGHT = 400
 FPS = 60
-bound = 20 
+bound = 20
 white = (255, 255, 255)
 blue = (0, 0, 255)
 black = (0, 0, 0)
@@ -16,44 +15,38 @@ win = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Pygame Ball Game")
 clock = pygame.time.Clock()
 
-x, y = WIDTH // 2, HEIGHT // 2 
+x, y = WIDTH // 2, HEIGHT // 2
 radius = 10
-velocity = 8 
+velocity = 8
 vp = 10
-score = 0 
+score = 0
 
-vx = velocity * func(-1, 1) 
-vy = velocity * func(-1, 1)
+vx = velocity * func(0.7, 1) * (-1 if func(0, 1) < 0.5 else 1)
+vy = velocity * func(0.7, 1) * (-1 if func(0, 1) < 0.5 else 1)
 
 border_l = bound + radius
 border_u = bound + radius
 border_r = WIDTH - bound - radius
 
-p_height = 10 
-p_width = 80 
+p_height = 10
+p_width = 80
 xp = (WIDTH - p_width) // 2
 yp = HEIGHT - p_height
 
 
 def drawScore():
-    """Відображає фінальний рахунок у центрі вікна з прихованим текстом."""
-    win.fill(black)
-    pygame.font.init()
-    path = pygame.font.match_font("arial")
-    Font = pygame.font.Font(path, 30)
-    text = ''.join([chr(int(str(el), 8)) for el in [107, 141, 155, 145, 40, 157, 166, 145, 162]])
-    a = Font.render(text, 1, (255, 255, 255))
-    win.blit(a, (WIDTH // 2 - 70, HEIGHT // 3))
-    pygame.display.update()
+    """Відображає фінальний рахунок у центрі вікна."""
+    font = pygame.font.Font(None, 50)
+    text = font.render(f"Your score: {score}", True, white)
+    text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+    win.blit(text, text_rect)
 
 def drawWindow():
     """Малює вікно, межі, м'яч та майданчик."""
     win.fill(black)
 
-    pygame.draw.rect(win, white, (0, 0, WIDTH, bound)) 
-
+    pygame.draw.rect(win, white, (0, 0, WIDTH, bound))
     pygame.draw.rect(win, white, (0, 0, bound, HEIGHT))
-
     pygame.draw.rect(win, white, (WIDTH - bound, 0, bound, HEIGHT))
 
     pygame.draw.circle(win, blue, (int(x), int(y)), radius)
@@ -71,14 +64,14 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-            game_over = True 
+            game_over = True
 
     keys = pygame.key.get_pressed()
     
     if keys[pygame.K_LEFT] and xp > bound:
         xp -= vp
     
-    if keys[pygame.K_RIGHT] and xp < WIDTH - bound - p_width:
+    if keys[pygame.K_RIGHT] and xp < WIDTH - p_width - bound:
         xp += vp
 
     x += vx
@@ -89,27 +82,31 @@ while run:
     
     if y + vy < border_u:
         vy = -vy
-
+    
     touch_paddle_y = (y + vy >= yp - radius) 
     
     touch_paddle_x = (xp <= x + vx and x + vx <= xp + p_width)
 
     if touch_paddle_y and touch_paddle_x:
         vy = -vy
-
-        num = 1.5
-        vx *= num
-        vy *= num
-
+        
+        if abs(vx) < 20:
+             vx *= 1.05
+        if abs(vy) < 20:
+             vy *= 1.05
+        
         score += 1
     
-    elif y + vy > yp:
+    elif y + vy > HEIGHT:
         run = False
 
     drawWindow()
 
 if not run and not game_over:
+    win.fill(black)
     drawScore()
-    sleep(10)
+    pygame.display.update()
     
+    pygame.time.delay(3000)
+
 pygame.quit()
