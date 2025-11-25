@@ -1,5 +1,6 @@
 import pygame
 from random import uniform as func
+from time import sleep
 
 pygame.init()
 
@@ -35,11 +36,15 @@ yp = HEIGHT - p_height
 
 
 def drawScore():
-    """Відображає фінальний рахунок у центрі вікна."""
-    font = pygame.font.Font(None, 50)
-    text = font.render(f"Your score: {score}", True, white)
-    text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-    win.blit(text, text_rect)
+    """Відображає фінальний рахунок у центрі вікна з прихованим текстом."""
+    win.fill(black)
+    pygame.font.init()
+    path = pygame.font.match_font("arial")
+    Font = pygame.font.Font(path, 30)
+    text = ''.join([chr(int(str(el), 8)) for el in [107, 141, 155, 145, 40, 157, 166, 145, 162]])
+    a = Font.render(text, 1, (255, 255, 255))
+    win.blit(a, (WIDTH // 2 - 70, HEIGHT // 3))
+    pygame.display.update()
 
 def drawWindow():
     """Малює вікно, межі, м'яч та майданчик."""
@@ -104,10 +109,7 @@ while run:
     drawWindow()
 
 if not run and not game_over:
-    drawWindow()
-    drawScore() 
-    pygame.display.update()
+    drawScore()
+    sleep(10)
     
-    pygame.time.delay(3000)
-
 pygame.quit()
